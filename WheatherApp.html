@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Forecast</title>
+    <style>
+      body {
+        background-color: lightgrey;
+        align-items: center;
+      }
+      h1 {
+        font-size: 80px;
+        text-align: center;
+      }
+      h2 {
+        text-align: center;
+        font-size: 50px;
+        font-family: "Times New Roman", Times, serif;
+      }
+      #weather-info {
+        font-size: 30px;
+      }
+      #weather-info li {
+        padding: 10px;
+      }
+
+      .container {
+        border: black solid;
+        background-color: aqua;
+        margin-left: 520px;
+        width: 500px;
+        height: 500px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Weather Forecast</h1>
+    <div class="container">
+      <h2 class="place">Alicante</h2>
+      <div id="weather-info">
+        <p class="IDK">Loading weather forecast...</p>
+      </div>
+    </div>
+
+    <script>
+      // Define the latitude and longitude of the location for which you want the weather forecast
+      const latitude = 38.34517;
+      const longitude = -0.48149;
+
+      // Construct the API URL
+      const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m`;
+
+      // Fetch weather forecast data from the API
+      fetch(apiUrl)
+        .then((response) => {
+          // Check if the response is successful
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          // Parse the JSON response
+          return response.json();
+        })
+        .then((data) => {
+          // Extract the temperature forecast from the data
+          const temperature = data.hourly.temperature_2m[0];
+          const wind = data.hourly.wind_speed_10m[0];
+          const humidity = data.hourly.relative_humidity_2m[0];
+          const precipitation = data.hourly.precipitation[0];
+
+          // Update the HTML content with the weather forecast
+          document.getElementById("weather-info").innerHTML = `
+          <ul>
+            <li>Temperature: ${temperature}°C</li>
+            <li>Wind speed: ${wind} (m/s)</li>
+            <li>Humidity: ${humidity}%</li>
+            <li>Precipitation: ${precipitation}</li>
+          </ul>
+`;
+        })
+        .catch((error) => {
+          // Handle any errors that occur during the fetch request
+          console.error("There was a problem with the fetch operation:", error);
+          // Update the HTML content to display an error message
+          document.getElementById("weather-info").innerHTML = `
+          <p>Failed to fetch weather forecast. Please try again later.</p>
+        `;
+        });
+    </script>
+  </body>
+</html>
